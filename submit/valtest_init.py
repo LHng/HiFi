@@ -4,6 +4,8 @@ import cv2
 import numpy as np
 import torch
 from torch.utils.data import Dataset, DataLoader
+import random
+from torchvision import transforms
 import os
 
 class Normaliztion_valtest(object):
@@ -12,10 +14,10 @@ class Normaliztion_valtest(object):
         image = (image - 127.5)/128
     """
     def __call__(self, sample):
-        image_x, binary_mask, string_name,spoofing_label = sample['image_x'],sample['binary_mask'],sample['string_name'],sample['spoofing_label']
+        image_x, binary_mask, string_name = sample['image_x'],sample['binary_mask'],sample['string_name']
         new_image_x = (image_x - 127.5)/128     # [-1,1]
         
-        return {'image_x': new_image_x, 'binary_mask': binary_mask, 'string_name': string_name,'spoofing_label': spoofing_label}
+        return {'image_x': new_image_x, 'binary_mask': binary_mask, 'string_name': string_name}
 
 class ToTensor_valtest(object):
     """
@@ -24,13 +26,13 @@ class ToTensor_valtest(object):
     """
 
     def __call__(self, sample):
-        image_x, binary_mask, string_name,spoofing_label = sample['image_x'],sample['binary_mask'],sample['string_name'],sample['spoofing_label']
+        image_x, binary_mask, string_name = sample['image_x'],sample['binary_mask'],sample['string_name']
         image_x = image_x[:, :, ::-1].transpose((2, 0, 1))
         image_x = np.array(image_x)
                         
         binary_mask = np.array(binary_mask)
         
-        return {'image_x': torch.from_numpy(image_x.astype(np.float)).float(), 'binary_mask': torch.from_numpy(binary_mask.astype(np.float)).float(), 'string_name': string_name,'spoofing_label': spoofing_label} 
+        return {'image_x': torch.from_numpy(image_x.astype(np.float)).float(), 'binary_mask': torch.from_numpy(binary_mask.astype(np.float)).float(), 'string_name': string_name}
 
 class Spoofing_valtest(Dataset):
 
@@ -48,16 +50,8 @@ class Spoofing_valtest(Dataset):
         videoname = str(self.landmarks_frame.iloc[idx, 0])
         image_path = os.path.join(self.root_dir, videoname)
 
-
-
-        spoofing_label = self.landmarks_frame.iloc[idx, 1]
-        if spoofing_label == 1:
-            spoofing_label = 1            # real
-        else:
-            spoofing_label = 0            # fake
-
         image_x, binary_mask = self.get_single_image_x(image_path)
-        sample = {'image_x': image_x, 'binary_mask': binary_mask, 'string_name': videoname, 'spoofing_label': spoofing_label}
+        sample = {'image_x': image_x, 'binary_mask': binary_mask, 'string_name': videoname}
 
         if self.transform:
             sample = self.transform(sample)
@@ -78,9 +72,3 @@ class Spoofing_valtest(Dataset):
                     binary_mask[i, j]=0.0
 
         return image_x, binary_mask
-
-
-            
- 
-
-
