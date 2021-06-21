@@ -21,7 +21,7 @@ def train_test():
     # os.environ["CUDA_VISIBLE_DEVICES"] = "0,1,2"
     model = HiFiNet( basic_conv=Conv2d_cd, theta=0.7)
     model = nn.DataParallel(model)
-    model.load_state_dict(torch.load('./log/submit_1/submit_1_11.pkl'))
+    model.load_state_dict(torch.load('./log/submit_1/submit_1_35.pkl'))
     model = model.cuda()
 
     # print(model)
