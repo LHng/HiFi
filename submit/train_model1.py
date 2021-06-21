@@ -126,8 +126,7 @@ def train_test():
         if epoch>=10 :
             model.eval()
             # save the model until the next improvement
-            torch.save(model.state_dict(),
-                       +'/'+args.log+'_%d.pkl' % (epoch + 1))
+            torch.save(model.state_dict(), log_fold +'/'+args.log+'_%d.pkl' % (epoch + 1))
 
             with torch.no_grad():
                 ###########################################
