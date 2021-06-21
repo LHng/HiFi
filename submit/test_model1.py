@@ -10,9 +10,10 @@ from valtest_init import Spoofing_valtest, Normaliztion_valtest, ToTensor_valtes
 import torch.nn as nn
 
 # Dataset root     
+# image_dir = '/home/txt/hl/FAS/HiFiMask/HiFiMask-Challenge/phase2'
+# test_list ='/home/txt/hl/FAS/HiFiMask/HiFiMask-Challenge/phase2/test.txt'
 image_dir = '/home/txt/hl/FAS/HiFiMask/HiFiMask-Challenge/phase1'
-test_list ='/home/txt/hl/FAS/HiFiMask/HiFiMask-Challenge/phase2/val_label.txt'
-
+test_list ='/home/txt/hl/FAS/HiFiMask/HiFiMask-Challenge/phase1/val.txt'
 # main function
 def train_test():
 
@@ -20,7 +21,7 @@ def train_test():
     # os.environ["CUDA_VISIBLE_DEVICES"] = "0,1,2"
     model = HiFiNet( basic_conv=Conv2d_cd, theta=0.7)
     model = nn.DataParallel(model)
-    model.load_state_dict(torch.load('./log/submit_1/submit_1_30.pkl'))
+    model.load_state_dict(torch.load('./log/submit_1/submit_1_11.pkl'))
     model = model.cuda()
 
     # print(model)
@@ -36,8 +37,6 @@ def train_test():
         dataloader_val = DataLoader(val_data, batch_size=1, shuffle=False, num_workers=4)
 
         map_score_list = []
-        label_all = []
-        score_all = []
         
         for i, sample_batched in enumerate(dataloader_val):
             
@@ -47,7 +46,7 @@ def train_test():
             inputs = sample_batched['image_x'].cuda()
             string_name, binary_mask = sample_batched['string_name'], sample_batched['binary_mask'].cuda()
 
-            map_x, embedding, x_Block1, x_Block2, x_Block3, x_input = model(inputs)
+            map_x = model(inputs)
             map_score = (torch.sum(map_x) / torch.sum(binary_mask)).cpu().numpy()
 
             if map_score>1:
