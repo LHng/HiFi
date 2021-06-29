@@ -155,8 +155,6 @@ def train_test():
                 with open(map_score_val_filename, 'w') as file:
                     file.writelines(map_score_list)
 
-                log_file.flush()
-
     print('Finished Training')
     log_file.close()
 
