@@ -137,15 +137,11 @@ def train_test():
                 dataloader_val = DataLoader(val_data, batch_size=1, shuffle=False, num_workers=4)
                 
                 map_score_list = []
-                label_all = []
-                score_all = []
                 
                 for i, sample_batched in enumerate(dataloader_val):
                     # get the inputs
                     inputs = sample_batched['image_x'].cuda()
                     string_name, binary_mask = sample_batched['string_name'], sample_batched['binary_mask'].cuda()
-                    val_label = sample_batched['spoofing_label']
-                    label_all = np.append(label_all,val_label)
 
                     optimizer.zero_grad()
                     map_x = model(inputs)
@@ -153,20 +149,11 @@ def train_test():
                     if map_score>1:
                         map_score = 1.0
 
-                    score_all = np.append(score_all,map_score)
-                    map_score_list.append('{} {} {}\n'.format( string_name[0], map_score, val_label[0]))
+                    map_score_list.append('{} {}\n'.format( string_name[0], map_score))
                     
                 map_score_val_filename = log_fold +'/score_val_'+ args.log+ '_%d.txt'% (epoch + 1)
                 with open(map_score_val_filename, 'w') as file:
                     file.writelines(map_score_list)
-
-                fpr, tpr, thresholds = roc_curve(label_all, score_all, pos_label=1)
-                acer = fpr - tpr
-                right_index = np.argmin(acer)
-                best_th = thresholds[right_index]
-                APCER = fpr[right_index]
-                BPCER = 1.0 - tpr[right_index]
-                ACER = (APCER+BPCER)/2.0
 
                 print('\t epoch:%d, thresholds=%.4f, APCER= %.4f, BPCER= %.4f, ACER= %.4f\n' % (epoch + 1, best_th, APCER, BPCER, ACER))
                 log_file.write('\t epoch:%d, thresholds=%.4f, APCER= %.4f, BPCER= %.4f, ACER= %.4f\n' % (epoch + 1, best_th, APCER, BPCER, ACER))
