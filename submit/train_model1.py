@@ -155,8 +155,6 @@ def train_test():
                 with open(map_score_val_filename, 'w') as file:
                     file.writelines(map_score_list)
 
-                print('\t epoch:%d, thresholds=%.4f, APCER= %.4f, BPCER= %.4f, ACER= %.4f\n' % (epoch + 1, best_th, APCER, BPCER, ACER))
-                log_file.write('\t epoch:%d, thresholds=%.4f, APCER= %.4f, BPCER= %.4f, ACER= %.4f\n' % (epoch + 1, best_th, APCER, BPCER, ACER))
                 log_file.flush()
 
     print('Finished Training')
